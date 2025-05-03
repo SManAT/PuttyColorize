@@ -3,6 +3,8 @@ import os
 
 from pathlib import Path
 
+from libs.TerminalColors import TerminalColors
+
 
 class Putty:
 
@@ -15,6 +17,9 @@ class Putty:
     def __init__(self):
         self.rootPath = Path(__file__).parent
         self.regFile = os.path.normpath(os.path.join(self.rootPath, "PuttyBackup.reg"))
+
+        self.term = TerminalColors()
+        self.term.set_BackgroundColor()
 
     def printNStore(self, msg):
         print(msg.strip())
@@ -110,6 +115,8 @@ class Putty:
             for d in self.data:
                 f.write(d)
         f.close()
+        s = os.path.join("src", os.path.basename(self.regFile))
+        self.term.print(f"\nPutty Config saved to  {s} ...", "RED")
 
     def exportPutty(self):
         print(f"*** Reading from {self.regFullKey} ***")
