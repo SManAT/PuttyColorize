@@ -19,6 +19,7 @@ dependencies = [
     'build',
     'pyyaml',
     'winreg',
+    'questionary',
 ]
 
 [build-system]

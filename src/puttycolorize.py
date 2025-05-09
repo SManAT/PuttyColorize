@@ -1,5 +1,6 @@
 import winreg
 import os
+import questionary
 
 from pathlib import Path
 
@@ -139,7 +140,35 @@ class Putty:
 
         # change_putty_setting(session_name, setting_name, new_value)
 
+    def search_files_in_dir(self, directory=".", pattern=""):
+        """
+        search for pattern in directory NOT recursive
+        :param directory: path where to search. relative or absolute
+        :param pattern: a list e.g. ['.jpg', '.gif']
+        """
+        data = []
+        for child in Path(directory).iterdir():
+            if child.is_file():
+                # print(f"{child.name}")
+                if pattern == "":
+                    data.append(os.path.join(directory, child.name))
+                else:
+                    for p in pattern:
+                        if child.name.endswith(p):
+                            data.append(os.path.join(directory, child.name))
+
+    def loadThemes(self):
+        """Load all themes, my own first"""
+        themesPath = os.path.normpath(os.path.join(self.rootPath, "themes"))
+        f = self.search_files_in_dir(themesPath)
+
+        x = 0
+        
+
     def start(self):
+        themes = self.loadThemes()
+        questionary.select("Which Color Theme to apply?", choices=themes).ask()
+
         self.exportPutty()
 
 
