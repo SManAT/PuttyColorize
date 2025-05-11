@@ -156,16 +156,23 @@ class Putty:
                     for p in pattern:
                         if child.name.endswith(p):
                             data.append(os.path.join(directory, child.name))
+        return data
 
     def loadThemes(self):
         """Load all themes, my own first"""
+        myfiles = self.search_files_in_dir(self.rootPath)
         themesPath = os.path.normpath(os.path.join(self.rootPath, "themes"))
-        f = self.search_files_in_dir(themesPath)
-
-        x = 0
-        
+        files = self.search_files_in_dir(themesPath)
+        data = []
+        for f in myfiles:
+            data.append(os.path.basename(f))
+        for f in files:
+            data.append(os.path.basename(f))
+        return data
 
     def start(self):
+        self.term.print(f"\nSee https://github.com/mbadolato/iTerm2-Color-Schemes ...", "YELLOW")
+
         themes = self.loadThemes()
         questionary.select("Which Color Theme to apply?", choices=themes).ask()
 

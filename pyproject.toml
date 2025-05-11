@@ -18,7 +18,6 @@ dependencies = [
     'setuptools',
     'build',
     'pyyaml',
-    'winreg',
     'questionary',
 ]
 
