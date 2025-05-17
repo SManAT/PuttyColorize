@@ -13,6 +13,8 @@ class Putty:
     regKey = r"Software\SimonTatham\PuTTY\Sessions"
     regFullKey = r"HKEY_CURRENT_USER" + "\\" + regKey
 
+    defaultProfile = "-All-"
+
     data = []
 
     def __init__(self):
@@ -160,23 +162,56 @@ class Putty:
 
     def loadThemes(self):
         """Load all themes, my own first"""
-        myfiles = self.search_files_in_dir(self.rootPath)
+        myfiles = self.search_files_in_dir(self.rootPath, ".reg")
         themesPath = os.path.normpath(os.path.join(self.rootPath, "themes"))
         files = self.search_files_in_dir(themesPath)
         data = []
         for f in myfiles:
-            data.append(os.path.basename(f))
+            if os.path.basename(f) != "PuttyBackup.reg":
+                data.append(os.path.basename(f))
+        # Trennlinien
+        data.append("------")
         for f in files:
             data.append(os.path.basename(f))
+        return data
+
+    def loadProfiles(self):
+        f = open(self.regFile, "r")
+        lines = f.readlines()
+        f.close()
+
+        data = []
+        data.append(self.defaultProfile)
+        for l in lines:
+            if self.regFullKey in l:
+                parts = l.split("\\")
+                name = parts[len(parts) - 1]
+                name = name.strip()
+                name = name[:-1]
+                if name != "Sessions":
+                    data.append(name)
         return data
 
     def start(self):
         self.term.print(f"\nSee https://github.com/mbadolato/iTerm2-Color-Schemes ...", "YELLOW")
 
-        themes = self.loadThemes()
-        questionary.select("Which Color Theme to apply?", choices=themes).ask()
-
         self.exportPutty()
+
+        profiles = self.loadProfiles()
+        p_answ = questionary.select("Which Profile to modify?", choices=profiles).ask()
+
+        themes = self.loadThemes()
+        answ = "------"
+        while answ == "------":
+            answ = questionary.select("Which Color Theme to apply?", choices=themes).ask()
+
+        if p_answ == self.defaultProfile:
+            ok = questionary.confirm(f"Using theme {answ} for all profiles?").ask()
+        else:
+            ok = questionary.confirm(f"Using theme {answ} for profile {p_answ}?").ask()
+
+        if ok:
+            print("changing")
 
 
 if __name__ == "__main__":
